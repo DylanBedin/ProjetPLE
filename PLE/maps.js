@@ -81,11 +81,7 @@ function getPoints() {
     //return points;
 
     return [
-        {location: new google.maps.LatLng(37.782551, -122.445368), weight: 0.5    google.maps.event.addListener(map, 'idle', function(){
-        actualBounds = map.getBounds();
-        actualZoom = map.getZoom();
-        console.log("bounds=" + actualBounds + ", zoom=" + actualZoom);
-    });},
+        {location: new google.maps.LatLng(37.782551, -122.445368), weight: 0.5},
         /*new google.maps.LatLng(37.782745, -122.444586),
         new google.maps.LatLng(37.782842, -122.443688),
         new google.maps.LatLng(37.782919, -122.442815),

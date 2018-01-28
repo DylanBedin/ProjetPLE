@@ -1,6 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <script async defer
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtMm6gZ8DU-9JitQTMkl5qLxU6rlNm-X8&libraries=visualization&callback=initMap">
+  </script>
+  <script >
+  var map;
+  var heatmap;
+
+  function initMap() {
+      map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: {lat: 0.0, lng: 0.0},
+          mapTypeId: 'satellite'
+      });
+
+      heatmap = new google.maps.visualization.HeatmapLayer({
+          data: getPoints(),
+          map: map
+      });
+      var bounds = map.getBounds();
+      console.log(map);
+  }
+
+
+
+  // Create a <script> tag and set the USGS URL as the source.
+  var script = document.createElement('script');
+  // This example uses a local copy of the GeoJSON stored at
+  // http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojsonp
+  script.src = 'https://developers.google.com/maps/documentation/javascript/examples/json/earthquake_GeoJSONP.js';
+  document.getElementsByTagName('head')[0].appendChild(script);
+
+  //points to be set on the heatmap
+  var points = [];
+  var actualBounds, actualZoom;
+
+var cpt = 0;
+  // Loop through the results array and place a marker for each
+  // set of coordinates.
+  window.eqfeed_callback = function(results) {
+      for (var i = 0; i < results.features.length; i++) {
+          var coords = results.features[i].geometry.coordinates;
+          var latLng = new google.maps.LatLng(coords[1],coords[0]);
+          points.push(new google.maps.LatLng(coords[1], coords[0]));
+      }
+      google.maps.event.addListener(map, 'idle', function(){
+          actualBounds = map.getBounds();
+          actualZoom = map.getZoom();
+          console.log("bounds=" + actualBounds + ", zoom=" + actualZoom);
+	  if(cpt % 2){
+	      points = [];
+	      points.push(new google.maps.LatLng(0, 0));
+	  }
+	  cpt++;
+      });
+  };
+
+  function toggleHeatmap() {
+      heatmap.setMap(heatmap.getMap() ? null : map);
+  }
+
+  function changeGradient() {
+      var gradient = [
+          'rgba(0, 255, 255, 0)',
+          'rgba(0, 255, 255, 1)',
+          'rgba(0, 191, 255, 1)',
+          'rgba(0, 127, 255, 1)',
+          'rgba(0, 63, 255, 1)',
+          'rgba(0, 0, 255, 1)',
+          'rgba(0, 0, 223, 1)',
+          'rgba(0, 0, 191, 1)',
+          'rgba(0, 0, 159, 1)',
+          'rgba(0, 0, 127, 1)',
+          'rgba(63, 0, 91, 1)',
+          'rgba(127, 0, 63, 1)',
+          'rgba(191, 0, 31, 1)',
+          'rgba(255, 0, 0, 1)'
+      ];
+      heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+  }
+
+  function changeRadius() {
+      heatmap.set('radius', heatmap.get('radius') ? null : 20);
+  }
+
+  function changeOpacity() {
+      heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+  }
+
+
+  function getPoints() {
+      return [
+          {location: new google.maps.LatLng(37.782551, -122.445368), weight: 0.5},
+      ];
+  }
+
+  </script>
     <meta charset="utf-8">
     <style>
         /* Always set the map height explicitly to define the size of the div
@@ -47,9 +143,5 @@
     <button onclick="changeOpacity()">Change opacity</button>
 </div>
 <div id="map"></div>
-<script type="text/javascript" src="maps.js"></script>
-<script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBtMm6gZ8DU-9JitQTMkl5qLxU6rlNm-X8&libraries=visualization&callback=initMap">
-</script>
 </body>
 </html>
